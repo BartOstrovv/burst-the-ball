@@ -1,0 +1,102 @@
+<html>
+    <body>
+        <script type="text/javascript">
+            //
+            var moveSpeed = 80;
+            var createScoreBallSpeed = 1200;
+            var createHealthBallSpeed = 6000;
+            var level = 1;
+            var step = 5;
+            var nextLevel = 25; //score > 25
+            var minMarginForBall = 10;
+            //Settings
+            var displayHeight = document.documentElement.clientHeight;
+            var displayWidth = document.documentElement.clientWidth;
+            var score = 0;
+            var life = 5;
+            
+            var CreateBallTimerID;
+            var CreateHealthBallTimerID;
+            var MoveBallTimerID;
+            var MoveHealthBallTimerID;
+            //
+            
+            function StartGame(){
+                document.write("<div id='containerBlock' style='display:block'><div id='container' style='background-color:red; font-size:60px; display:flex; justify-content:space-between'>");
+                document.getElementById("container").innerHTML += "<div id='life'>Life: "+life+"</div>";
+                
+                document.getElementById("container").innerHTML += "<div id='score'>Score: "+score+"</div>";
+                document.getElementById("container").innerHTML+= "</div>";
+                
+                document.getElementById("containerBlock").innerHTML += "<img src='http://www.imarvintpa.com/Mapping/Objects/Structures/Obstacles/ChevalDeFrise_sfb_hrc.png'; style='height: 100px; width:100%;'/>"
+                
+                document.getElementById("containerBlock").innerHTML+= "</div>";
+                
+                CreateBallTimerID = setInterval(CreateBallon, createScoreBallSpeed);
+                MoveBallTimerID = setInterval(MoveBallon, moveSpeed);
+                CreateHealthBallTimerID = setInterval(CreateHealthBallon, createHealthBallSpeed);
+            }
+            
+            function CreateBallon(){
+               document.getElementById("containerBlock").innerHTML += "<img onclick=Burts(this) class='ballon' src='https://hotemoji.com/images/emoji/5/37ye1q1gokjb5.png' style='margin-top:"+(displayHeight -  getComputedStyle(document.getElementById("container")).height.slice(0, -2) - 200)+"px; width:75px; height:75px; position:absolute; display:block; margin-left:"+getRandomInt(0, displayWidth - 100)+"px;'/>"
+            }
+            
+            function CreateHealthBallon(){
+               document.getElementById("containerBlock").innerHTML += "<img onclick=BurtsHealth(this) class='ballon' src='https://deti-online.com/img/vozdushnyy-sharik-color.jpg' style='margin-top:"+(displayHeight -  getComputedStyle(document.getElementById("container")).height.slice(0, -2) - 200)+"px; width:75px; height:75px; position:absolute; display:block; margin-left:"+getRandomInt(0, displayWidth - 100)+"px;'/>"
+            }
+            
+            function MoveBallon(){
+                var imgBal = document.getElementsByClassName("ballon");
+                for (var i = 0; i < imgBal.length; i++){
+                    var marginTop = +window.getComputedStyle(imgBal[i]).marginTop.slice(0,-2);
+                    if (marginTop <= minMarginForBall)
+                        {
+                            if (--life <= 0)
+                                EndGame();
+                            imgBal[i].remove();
+                            document.getElementById("life").innerText = "Life: "+life;
+                        }
+                    else
+                        {
+                            imgBal[i].style.marginTop = marginTop - step + "px";
+                        }
+                    }
+            }
+            
+            function Burts(ball){
+                ball.remove();
+                document.getElementById("score").innerText = "Score: " +(score+=level);
+                
+                if (score > nextLevel)
+                    {
+                        level++;
+                        nextLevel += nextLevel;
+                        moveSpeed -= 5;
+                        
+                        clearInterval(MoveBallTimerID);
+                        setInterval(MoveBallon, moveSpeed);
+                    }
+            }
+            
+            function BurtsHealth(ball){
+                ball.remove();
+                document.getElementById("life").innerText = "Life: " + ++life;
+            }
+            
+            function EndGame(){
+                clearInterval(CreateBallTimerID);
+                clearInterval(MoveBallTimerID);
+                document.getElementById("containerBlock").innerHTML ="<div style='background-color: blue; font-size:80px;'>GAME OVER</br>SCORE: "+score+"</div>";
+            }
+            
+            function getRandomInt(min, max){
+                min = Math.ceil(min);
+                max = Math.floor(max);
+                return Math.floor(Math.random() * (max-min)) + min;
+            }
+            StartGame();
+            
+            
+        </script>
+    </body>
+</html>
